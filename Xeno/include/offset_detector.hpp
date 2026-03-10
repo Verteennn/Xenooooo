@@ -31,7 +31,6 @@ public:
         std::uint64_t ModuleFlags;
         std::uint64_t ObjectValue;
         std::string RobloxVersion;
-        std::chrono::system_clock::time_point DetectionTime;
     };
 
 private:
@@ -51,8 +50,7 @@ private:
         0x1a8,     // IsCoreScript
         0x1a4,     // ModuleFlags
         0xc0,      // ObjectValue
-        "unknown", // RobloxVersion
-        std::chrono::system_clock::now()
+        "unknown"  // RobloxVersion
     };
 
 public:
