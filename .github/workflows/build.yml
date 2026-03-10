@@ -8,21 +8,18 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        config: [Release, Debug]
     
     steps:
       - uses: actions/checkout@v4
       
       - uses: microsoft/setup-msbuild@v1
       
-      - name: Build Xeno ${{ matrix.config }}
-        run: msbuild Xeno.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64 /m /v:detailed
+      - name: Build Xeno Release
+        run: msbuild Xeno.sln /p:Configuration=Release /p:Platform=x64 /m /v:minimal
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Xeno-${{ matrix.config }}-x64
-          path: Xeno/bin/${{ matrix.config }}/x64/
+          name: Xeno-Release-x64
+          path: Xeno/bin/Release/x64/
           retention-days: 30
