@@ -37,8 +37,7 @@ jobs:
       
       - name: Install dependencies with vcpkg
         run: |
-          cd ${{ env.VCPKG_ROOT }}
-          .\vcpkg install --triplet x64-windows
+          ${{ env.VCPKG_ROOT }}\vcpkg install --triplet x64-windows
         shell: pwsh
         working-directory: ${{ github.workspace }}
       
