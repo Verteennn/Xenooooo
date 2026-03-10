@@ -22,11 +22,13 @@ jobs:
       
       - name: Install dependencies
         run: |
-          C:\vcpkg\vcpkg install openssl:x64-windows xxhash:x64-windows zstd:x64-windows --vcpkg-root=C:\vcpkg
+          C:\vcpkg\vcpkg install --triplet x64-windows
         shell: cmd
       
       - name: Build Xeno DLL
         run: msbuild Xeno/Xeno.vcxproj /p:Configuration=Release /p:Platform=x64 /m
+        env:
+          VCPKG_ROOT: C:\vcpkg
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
