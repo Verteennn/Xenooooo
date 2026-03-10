@@ -1,129 +1,28 @@
-name: Build Xeno (Debug + Release)
+name: Build Xeno
 
 on:
   push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build ${{ matrix.config }}
     runs-on: windows-latest
     strategy:
-      fail-fast: false
       matrix:
         config: [Release, Debug]
-        arch: [x64]
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Setup MSVC
-        uses: microsoft/setup-msbuild@v1
-        with:
-          vs-version: 'latest'
-
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v10
-        with:
-          vcpkgDirectory: '${{ runner.workspace }}/vcpkg'
-          vcpkgGitCommitId: '8eb57dc1a4da385e849519e569000994617b16f3'
-          appendedCacheKey: 'xeno'
-
-      - name: Integrate vcpkg
-        run: |
-          & "${{ runner.workspace }}/vcpkg/vcpkg.exe" integrate install
-
-      - name: Install vcpkg dependencies (xxhash, zstd, openssl)
-        run: |
-          & "${{ runner.workspace }}/vcpkg/vcpkg.exe" install `
-            xxhash:x64-windows `
-            zstd:x64-windows `
-            openssl:x64-windows
-
-      - name: Build Xeno (C++)
-        working-directory: ${{ github.workspace }}
-        run: |
-          msbuild Xeno.sln `
-            /p:Configuration=${{ matrix.config }} `
-            /p:Platform=x64 `
-            /m
-
-      - name: Build XenoUI (C#)
-        working-directory: ${{ github.workspace }}/XenoUI
-        run: |
-          dotnet build XenoUI.csproj `
-            -c ${{ matrix.config }} `
-            -p:Platform=x64
-
-      - name: Upload Build Artifacts (${{ matrix.config }})
+      - uses: actions/checkout@v4
+      
+      - uses: microsoft/setup-msbuild@v1
+      
+      - name: Build Xeno ${{ matrix.config }}
+        run: msbuild Xeno.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64 /m
+      
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Xeno-${{ matrix.config }}-x64
-          path: |
-            Xeno/bin/${{ matrix.config }}/x64/
-            XenoUI/bin/${{ matrix.config }}/
+          path: Xeno/bin/${{ matrix.config }}/x64/
           retention-days: 30
-
-      - name: Create Release (if Release build on push to main)
-        if: matrix.config == 'Release' && github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release Build ${{ github.run_number }}
-          body: |
-            Automated build from commit ${{ github.sha }}
-            
-            **Debug Build**: Available in artifacts
-            **Release Build**: Available in artifacts
-            
-            ## Build Info
-            - Compiler: MSVC (Latest)
-            - Platform: x64
-            - Configuration: ${{ matrix.config }}
-            - Date: ${{ github.event.head_commit.timestamp }}
-          draft: false
-          prerelease: false
-
-  test:
-    name: Validate Build
-    runs-on: windows-latest
-    needs: build
-    steps:
-      - name: Download Release Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: Xeno-Release-x64
-
-      - name: Check Xeno.dll exists
-        run: |
-          if (Test-Path "Xeno\bin\Release\x64\Xeno.dll") {
-            Write-Host "✓ Xeno.dll found"
-          } else {
-            Write-Host "✗ Xeno.dll NOT found"
-            exit 1
-          }
-
-      - name: Check XenoUI.exe exists
-        run: |
-          $files = Get-ChildItem -Path "XenoUI\bin\Release\" -Filter "*.exe" -Recurse
-          if ($files.Count -gt 0) {
-            Write-Host "✓ XenoUI.exe found: $($files[0].FullName)"
-          } else {
-            Write-Host "✗ XenoUI.exe NOT found"
-            exit 1
-          }
-
-      - name: Build Summary
-        run: |
-          Write-Host "========================================="
-          Write-Host "Build Validation PASSED"
-          Write-Host "========================================="
-          Write-Host "Artifacts ready for download in Actions tab"
