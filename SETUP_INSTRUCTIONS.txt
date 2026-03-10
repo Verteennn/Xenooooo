@@ -1,0 +1,243 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                 XENO GITHUB CI/CD SETUP - INSTRUKCJA KROK PO KROKU           ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ WSZYSTKO JEST GOTOWE! 
+
+Projekt zawiera:
+  ✓ GitHub Actions Workflow (.github/workflows/build.yml)
+  ✓ Auto-Offset Detection System (offset_detector.hpp + offset_verifier.hpp)
+  ✓ Helper Scripts (build.bat, github_setup.ps1)
+  ✓ Dokumentacja (BUILD_GUIDE.md, AUTO_OFFSET_SYSTEM.md)
+
+════════════════════════════════════════════════════════════════════════════════
+
+🚀 SZYBKI START (5 MINUT)
+
+════════════════════════════════════════════════════════════════════════════════
+
+KROK 1: Utwórz GitHub Repo
+─────────────────────────────
+
+Opcja A - Ręcznie (2 minuty):
+  1. Otwórz: https://github.com/new
+  2. Nazwa: XenoExecutor-xeno
+  3. Visibility: Wybierz Public lub Private
+  4. Klik: "Create repository"
+  5. Kopiuj URL repo (https://github.com/TWOJA_NAZWA/XenoExecutor-xeno.git)
+
+Opcja B - CLI (jeśli masz GitHub CLI):
+  gh repo create XenoExecutor-xeno --source=. --remote=origin --push
+
+════════════════════════════════════════════════════════════════════════════════
+
+KROK 2: Pushuj Kod
+──────────────────
+
+Opcja A - Automatycznie (RECOMMENDED - 30 sekund):
+
+  Otwórz PowerShell w projekcie i uruchom:
+  
+    cd C:\Users\aio_01\Desktop\XenoExecutor-xeno
+    .\github_setup.ps1
+  
+  Script zapyta o username i zrobi wszystko automatycznie!
+
+
+Opcja B - Ręcznie (60 sekund):
+
+  1. Otwórz PowerShell
+  
+  2. Przejdź do projektu:
+     cd C:\Users\aio_01\Desktop\XenoExecutor-xeno
+  
+  3. Ustawić remote (zamień YOUR_USERNAME na twój GitHub username):
+     git remote add origin https://github.com/YOUR_USERNAME/XenoExecutor-xeno.git
+  
+  4. Przełącz na main branch:
+     git branch -M main
+  
+  5. Commituj i pushuj:
+     git add .
+     git commit -m "Initial commit: Xeno with auto-offset system and CI/CD"
+     git push -u origin main
+  
+  6. Jeśli poprosi o hasło:
+     - Użyj Personal Access Token zamiast hasła
+     - Utwórz: https://github.com/settings/tokens
+
+════════════════════════════════════════════════════════════════════════════════
+
+KROK 3: Czekaj Build (2-5 minut)
+─────────────────────────────────
+
+  Po push'aniu:
+  
+  1. Idź na: https://github.com/YOUR_USERNAME/XenoExecutor-xeno
+  2. Klik na закладкę "Actions"
+  3. Powinien być workflow "Build Xeno" z żółtym kolorem (building)
+  4. Czekaj aż status zmieni się na zielony ✓
+  
+  Workflow robi:
+    • Instaluje MSVC compiler
+    • Pobiera vcpkg i dependencje (xxhash, zstd, openssl)
+    • Kompiluje Xeno.dll (C++)
+    • Kompiluje XenoUI.exe (C#)
+    • Tworzy Release (jeśli Release build)
+
+════════════════════════════════════════════════════════════════════════════════
+
+KROK 4: Pobierz Skompilowany .exe (1 minuta)
+──────────────────────────────────────────────
+
+  1. GitHub Actions → Najnowszy workflow run
+  2. Przewiń w dół do "Artifacts" sekcji
+  3. Pobierz "Xeno-Release-x64" (lub Debug)
+  4. Rozpakuj ZIP
+  5. Masz wszystko:
+     - Xeno/bin/Release/x64/Xeno.dll
+     - XenoUI/bin/Release/XenoUI.exe
+
+════════════════════════════════════════════════════════════════════════════════
+
+📋 STATUS CHECKLIST
+════════════════════════════════════════════════════════════════════════════════
+
+Powinno Być:
+
+  ✓ .github/workflows/build.yml              (GitHub Actions config)
+  ✓ Xeno/include/offset_detector.hpp          (Auto-offset system)
+  ✓ Xeno/include/offset_verifier.hpp          (Offset validation)
+  ✓ Xeno/src/worker.cpp (+ OffsetManager)    (Integration)
+  ✓ BUILD_GUIDE.md                            (Documentation)
+  ✓ GITHUB_QUICKSTART.md                      (Quick reference)
+  ✓ AUTO_OFFSET_SYSTEM.md                     (Offset system docs)
+  ✓ GITHUB_SETUP_SUMMARY.md                   (Summary)
+  ✓ build.bat                                 (Build helper)
+  ✓ github_setup.ps1                          (GitHub setup helper)
+
+════════════════════════════════════════════════════════════════════════════════
+
+🎯 WORKFLOW DETAILS
+════════════════════════════════════════════════════════════════════════════════
+
+Automatycznie buduje się gdy:
+  ✓ Push'niesz na main branch
+  ✓ Push'niesz na master lub develop branch
+  ✓ Otwiersz Pull Request do main
+  ✓ Ręcznie: Actions tab → "Run workflow"
+
+Builduje:
+  ✓ Debug Configuration (x64)
+  ✓ Release Configuration (x64)
+
+Artifacts (30 dni retention):
+  ✓ Xeno-Debug-x64
+  ✓ Xeno-Release-x64
+
+Output:
+  ✓ Xeno.dll
+  ✓ Xeno.pdb (debug symbols)
+  ✓ XenoUI.exe
+  ✓ Auto Release (dla Release builds)
+
+════════════════════════════════════════════════════════════════════════════════
+
+🔄 CODZIENNE UŻYCIE
+════════════════════════════════════════════════════════════════════════════════
+
+Po Setup, normalnie po prostu:
+
+  1. Edytuj kod lokalnie
+  2. Commituj:
+     git add .
+     git commit -m "Opis zmian"
+  3. Push:
+     git push origin main
+  4. Build Automatycznie się uruchamia!
+  5. Pobierz artefakty z GitHub Actions
+
+════════════════════════════════════════════════════════════════════════════════
+
+🛠️ JEŚLI COŚ SIĘ NIE UDA
+════════════════════════════════════════════════════════════════════════════════
+
+Problem: "git remote already exists"
+→ git remote remove origin
+→ Spróbuj ponownie
+
+Problem: "Authentication failed"
+→ Utwórz Personal Access Token: https://github.com/settings/tokens
+→ Użyj token zamiast hasła
+
+Problem: "Build failed na GitHub"
+→ Klik workflow run → View workflow file → Sprawdź job logs
+→ Zwykle to brakujące zależności vcpkg
+
+Problem: "Artifacts not found"
+→ Build jeszcze się nie skończył
+→ Czekaj na zielony ✓ status
+
+════════════════════════════════════════════════════════════════════════════════
+
+📚 DOKUMENTACJA
+════════════════════════════════════════════════════════════════════════════════
+
+Dostępne pliki:
+
+  1. GITHUB_QUICKSTART.md
+     → 5-minutowy szybki start
+  
+  2. BUILD_GUIDE.md
+     → Pełna dokumentacja (GitHub Actions + Local)
+  
+  3. AUTO_OFFSET_SYSTEM.md
+     → Jak działa auto-offset detection
+  
+  4. GITHUB_SETUP_SUMMARY.md
+     → Overview całego setup
+
+════════════════════════════════════════════════════════════════════════════════
+
+💡 PRO TIPS
+════════════════════════════════════════════════════════════════════════════════
+
+1. Status Badge w README
+   Dodaj do README.md:
+   
+   [![Build Status](https://github.com/YOUR_USERNAME/XenoExecutor-xeno/workflows/Build%20Xeno/badge.svg)](https://github.com/YOUR_USERNAME/XenoExecutor-xeno/actions)
+
+2. Auto-Offset System
+   Projekt automatycznie detectuje offsety Robloxu:
+   - Cachuje je na dysk
+   - Fallback na hardcoded values
+   - Nie potrzebujesz ręcznie updatować!
+
+3. Lokalne Testowanie
+   Jeśli chcesz buildować lokalnie zamiast na GitHub:
+   
+   cd C:\Users\aio_01\Desktop\XenoExecutor-xeno
+   .\build.bat
+   
+   Menu: Wybierz "Build Release" lub "Build Debug"
+
+════════════════════════════════════════════════════════════════════════════════
+
+🎉 GOTOWE!
+════════════════════════════════════════════════════════════════════════════════
+
+Teraz możesz:
+
+  ✅ Pushować kod na GitHub
+  ✅ GitHub Actions automatycznie buduje
+  ✅ Pobierać .exe pliki
+  ✅ Trackować build history
+  ✅ Shareować builds z zespołem
+
+════════════════════════════════════════════════════════════════════════════════
+
+START Z KROKU 1! 🚀
+
+════════════════════════════════════════════════════════════════════════════════
