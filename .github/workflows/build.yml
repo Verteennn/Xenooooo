@@ -5,44 +5,28 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-env:
-  VCPKG_ROOT: C:\vcpkg
-
 jobs:
   build:
     runs-on: windows-latest
     
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
       - uses: microsoft/setup-msbuild@v1
       
-      - name: Cache vcpkg
-        uses: actions/cache@v3
-        with:
-          path: C:\vcpkg
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-      
-      - name: Install vcpkg
+      - name: Setup vcpkg
         run: |
-          if (-Not (Test-Path C:\vcpkg)) {
-            git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
-            cd C:\vcpkg
-            .\bootstrap-vcpkg.bat
-          }
-          echo "VCPKG_ROOT=C:\vcpkg" >> $env:GITHUB_ENV
-        shell: pwsh
+          git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
+          C:\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+        shell: cmd
       
-      - name: Install dependencies with vcpkg
+      - name: Install dependencies
         run: |
-          ${{ env.VCPKG_ROOT }}\vcpkg install --triplet x64-windows
-        shell: pwsh
-        working-directory: ${{ github.workspace }}
+          C:\vcpkg\vcpkg install openssl:x64-windows xxhash:x64-windows zstd:x64-windows --vcpkg-root=C:\vcpkg
+        shell: cmd
       
-      - name: Build Xeno Release
-        run: msbuild Xeno.sln /p:Configuration=Release /p:Platform=x64 /m /v:normal
+      - name: Build Xeno DLL
+        run: msbuild Xeno/Xeno.vcxproj /p:Configuration=Release /p:Platform=x64 /m
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -50,7 +34,6 @@ jobs:
           name: Xeno-Release-x64
           path: |
             Xeno/bin/Release/x64/*.dll
-            Xeno/bin/Release/x64/*.exe
-            XenoUI/bin/Release/*.exe
+            Xeno/bin/Release/x64/*.pdb
           retention-days: 30
-        if: success()
+        if: always()
