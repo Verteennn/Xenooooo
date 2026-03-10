@@ -73,7 +73,6 @@ public:
         // Attempt to auto-detect offsets
         OffsetCache detected = AutoDetectOffsets(processHandle);
         detected.RobloxVersion = robloxVersion;
-        detected.DetectionTime = std::chrono::system_clock::now();
 
         // Validate detected offsets
         if (ValidateOffsets(detected)) {
